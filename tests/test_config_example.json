@@ -1,0 +1,17 @@
+{
+	"secret_key": "sk_test_",
+	"email": [
+		{
+			"to": "email@email.com",
+			"from": {
+				"name": "Sender",
+				"email": "email@email.com"
+			},
+			"subject": "test email",
+			"content": {
+				"html": "<html><head></head><body>Here is an email <b>bold</b></body></html>",
+				"text": "Here is an email"
+			}
+		}
+	]
+}

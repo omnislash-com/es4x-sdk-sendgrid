@@ -1,0 +1,38 @@
+{
+	"name": "es4x-sdk-sendgrid",
+	"displayName": "ES4X SendGrid SDK",
+	"version": "0.1.1",
+	"description": "SendGrid SDK for the ES4X Runtime.",
+	"main": "index.js",
+	"keywords": [
+		"es4x",
+		"javascript",
+		"vertex",
+		"sendgrid",
+		"email"
+	],
+	"author": {
+		"name": "Michael Jegat (Omnislash)",
+		"email": "michael@omnislash.com",
+		"url": "https://omnislash.com"
+	},
+	"dependencies": {
+		"@vertx/core": "4.1.0",
+		"@vertx/web": "4.2.5",
+		"@vertx/web-client": "4.2.5",
+		"es4x-utils": "github:omnislash-com/es4x-utils#main"
+	},
+	"devDependencies": {
+		"@es4x/create": "0.14.0",
+		"@vertx/unit": "4.1.0"
+	},
+	"mvnDependencies": [
+		"com.fasterxml.jackson.core:jackson-databind:2.9.10.3"
+	],
+	"scripts": {
+		"postinstall": "es4x install",
+		"start": "es4x",
+		"test:Email": "es4x test tests/Email.test.js",
+		"update:helpers": "npm install git+https://github.com/omnislash-com/es4x-utils.git#main"
+	}
+}
