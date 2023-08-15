@@ -11,7 +11,7 @@ const	config = require('./test_config.json');
 const suite = TestSuite.create("ES4X Test: Email");
 
 
-suite.test("SendGridAPI.checkout_createPaymentSession", async function (context) {
+suite.test("SendGridAPI.sendEmail", async function (context) {
 
 	let async = context.async();
 

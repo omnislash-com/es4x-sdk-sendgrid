@@ -33,6 +33,7 @@
 		"postinstall": "es4x install",
 		"start": "es4x",
 		"test:Email": "es4x test tests/Email.test.js",
+		"test:Sender": "es4x test tests/SenderVerification.test.js",
 		"update:helpers": "npm install git+https://github.com/omnislash-com/es4x-utils.git#main"
 	}
 }
