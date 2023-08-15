@@ -102,7 +102,7 @@ class	SendGridAPI
 		return result;
 	}
 
-	async	senderVerification_create(_nickname, _email, _fromName, _secretKey = "")
+	async	senderVerification_create(_nickname, _email, _fromName, _addressStreet, _addressState, _addressCity, _addressCountry, _addressZip, _secretKey = "")
 	{
 		// first we need to make sure it doesn't exist already!
 		let	existingSender = await this.senderVerification_get(_email, _secretKey);
@@ -116,12 +116,12 @@ class	SendGridAPI
 			reply_to: _email,
 			from_name: _fromName,
 			reply_to_name: _fromName,
-			"address": "aaaa",
-			"address2": "",
-			"state": "CA",
-			"city": "San Francisco",
-			"country": "USA",
-			"zip": "94105"
+			address: _addressStreet,
+			address2: "",
+			state: _addressState,
+			city: _addressCity,
+			country: _addressCountry,
+			zip: _addressZip
 		};
 
 		// send the query

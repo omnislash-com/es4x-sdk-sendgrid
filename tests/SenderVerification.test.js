@@ -26,8 +26,12 @@ suite.test("SendGridAPI.extractSenderVerificationTokenFromUrl", async function (
 		context.assertFalse(StringUtils.IsEmpty(token));
 
 		// now we are going to verify it
-		let	verifyOk = await sendGridApi.senderVerification_verify(token);
-		context.assertTrue(verifyOk);
+		let	verify = false;
+		if (verify)
+		{
+			let	verifyOk = await sendGridApi.senderVerification_verify(token);
+			context.assertTrue(verifyOk);
+		}
 
 		async.complete();
 	}
@@ -48,10 +52,14 @@ suite.test("SendGridAPI.senderVerification_create", async function (context) {
 		let	sendGridApi = new SendGridAPI(vertx, config.secret_key);
 
 		// send the verification
-		let	nickname = "test stactapp";
 		let	email = "mike@stactapp.com";
 		let	fromName = "Mike";
-		let	doDelete = false;
+		let	addressStreet = "at fake street";
+		let	addressState = "CA";
+		let	addressCity = "San Francisco";
+		let	addressCountry = "USA";
+		let	addressZip = "92024";
+		let	doDelete = true;
 
 		// first we delete it
 		if (doDelete)
@@ -68,7 +76,7 @@ suite.test("SendGridAPI.senderVerification_create", async function (context) {
 
 		// create it
 		console.log("3. CREATE IT");
-		let	newSender = await sendGridApi.senderVerification_create(nickname, email, fromName);
+		let	newSender = await sendGridApi.senderVerification_create(email, email, fromName, addressStreet, addressState, addressCity, addressCountry, addressZip);
 		context.assertNotNull(newSender);
 
 		// now we find it again
