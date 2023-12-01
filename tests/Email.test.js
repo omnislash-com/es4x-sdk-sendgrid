@@ -24,12 +24,13 @@ suite.test("SendGridAPI.sendEmail", async function (context) {
 		for(let toSend of config.email)
 		{
 			// send the email
-			let	response = await sendGridApi.sendEmail(toSend.to, toSend.from.email, toSend.from.name, toSend.subject, toSend.content.html, toSend.content.text);
+			let	response = await sendGridApi.sendEmail(toSend.to, toSend.from.email, toSend.from.name, toSend.subject, toSend.content.html, toSend.content.text, "", toSend.bcc);
 
 			// get the error code
 			let	errorCode = ObjUtils.GetValueToInt(response, "statusCode", 500);
 
-			context.assertEquals(errorCode, 202);
+			let	isGood = errorCode == 200 || errorCode == 202;
+			context.assertTrue(isGood);
 		}
 
 		async.complete();

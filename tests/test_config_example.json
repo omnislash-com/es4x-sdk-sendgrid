@@ -11,7 +11,8 @@
 			"content": {
 				"html": "<html><head></head><body>Here is an email <b>bold</b></body></html>",
 				"text": "Here is an email"
-			}
+			},
+			"bcc": []
 		}
 	]
 }

@@ -4,6 +4,7 @@ import { WebClientMgr } from 'es4x-utils/src/network/WebClientMgr';
 import { QueryUtils } from 'es4x-utils/src/network/QueryUtils';
 import { StringUtils } from 'es4x-utils/src/utils/StringUtils';
 import { UrlUtils } from 'es4x-utils/src/utils/UrlUtils';
+import { ArrayUtils } from 'es4x-utils/src/utils/ArrayUtils';
 
 class	SendGridAPI
 {
@@ -52,8 +53,8 @@ class	SendGridAPI
 		return response;
 	}
 
-
-	async	sendEmail(_toEmail, _fromEmail, _fromName, _subject, _contentHTML, _contentText = "", _secretKey = "")
+	// https://docs.sendgrid.com/api-reference/mail-send/mail-send
+	async	sendEmail(_toEmail, _fromEmail, _fromName, _subject, _contentHTML, _contentText = "", _secretKey = "", _bccEmails = [])
 	{
 		// build the message body
 		let	body = {
@@ -77,6 +78,17 @@ class	SendGridAPI
 			"subject": _subject,
 			"content": []
 		};
+
+		// add bcc emails?
+		if (ArrayUtils.IsEmpty(_bccEmails) == false)
+		{
+			// create the field
+			body.personalizations[0]["bcc"] = [];
+			for(let email of _bccEmails)
+			{
+				body.personalizations[0].bcc.push({"email": email});
+			}
+		}
 
 		// text content? Must be first!
 		if (StringUtils.IsEmpty(_contentText) == false)
