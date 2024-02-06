@@ -82,11 +82,15 @@ class	SendGridAPI
 		// add bcc emails?
 		if (ArrayUtils.IsEmpty(_bccEmails) == false)
 		{
-			// create the field
+			// Avoid SendGrid error: Do not include the main recipient's email address (_toEmail) in the BCC list.
 			body.personalizations[0]["bcc"] = [];
 			for(let email of _bccEmails)
 			{
-				body.personalizations[0].bcc.push({"email": email});
+				// do not add
+				if (email !== _toEmail)
+				{
+					body.personalizations[0].bcc.push({"email": email});
+				}			
 			}
 		}
 
