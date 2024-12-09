@@ -54,17 +54,28 @@ class	SendGridAPI
 	}
 
 	// https://docs.sendgrid.com/api-reference/mail-send/mail-send
-	async	sendEmail(_toEmail, _fromEmail, _fromName, _subject, _contentHTML, _contentText = "", _secretKey = "", _bccEmails = [])
+	async	sendEmailToMultiple(_toEmails, _fromEmail, _fromName, _subject, _contentHTML, _contentText = "", _secretKey = "", _bccEmails = [])
 	{
+		// get the emails
+		let	toEmails = [];
+		let	allEmails = [];
+		for(let info of _toEmails)
+		{
+			let	email = ObjUtils.GetValueToString(info, "email");
+			if (StringUtils.IsEmpty(email) == false)
+			{
+				toEmails.push({email: email});
+				allEmails.push(email);
+			}
+		}
+		if (ArrayUtils.IsEmpty(toEmails) == true)
+			return null;
+
 		// build the message body
 		let	body = {
 			"personalizations": [
 				{
-					"to": [
-						{
-							"email": _toEmail
-						}
-					]
+					"to": toEmails
 				}
 			],
 			"from": {
@@ -87,7 +98,7 @@ class	SendGridAPI
 			for(let email of _bccEmails)
 			{
 				// do not add
-				if (email !== _toEmail)
+				if (allEmails.includes(email) == false)
 				{
 					body.personalizations[0].bcc.push({"email": email});
 				}			
@@ -114,8 +125,12 @@ class	SendGridAPI
 
 		// send the query
 		let	result = await this.query(QueryUtils.HTTP_METHOD_POST, "/mail/send", body, _secretKey);
-		console.log(result);
 		return result;
+	}
+
+	async	sendEmail(_toEmail, _fromEmail, _fromName, _subject, _contentHTML, _contentText = "", _secretKey = "", _bccEmails = [])
+	{
+		return await this.sendEmailToMultiple([{email: _toEmail}], _fromEmail, _fromName, _subject, _contentHTML, _contentText, _secretKey, _bccEmails);
 	}
 
 	async	senderVerification_create(_nickname, _email, _fromName, _addressStreet, _addressState, _addressCity, _addressCountry, _addressZip, _secretKey = "")
