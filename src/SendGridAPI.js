@@ -61,9 +61,10 @@ class	SendGridAPI
 		let	allEmails = [];
 		for(let info of _toEmails)
 		{
-			let	email = ObjUtils.GetValueToString(info, "email");
-			if (StringUtils.IsEmpty(email) == false)
+			let	email = ObjUtils.GetValueToString(info, "email").toLowerCase();
+			if ( (StringUtils.IsEmpty(email) == false) && (allEmails.includes(email) == false) )
 			{
+
 				toEmails.push({email: email});
 				allEmails.push(email);
 			}
