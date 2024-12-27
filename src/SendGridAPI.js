@@ -53,8 +53,79 @@ class	SendGridAPI
 		return response;
 	}
 
+	async	retrieveAttachments(_attachments)
+	{
+		// build the final structure for the attachments
+		let	finalAttachments = [];
+
+		// go through all of them
+		for(let attachment of _attachments)
+		{
+			// retrieve the data and info of the attachment
+			let	attachmentData = await this.retrieveAttachmentData(attachment);
+
+			// if it is valid, we add it to the final list
+			if (attachmentData != null)
+			{
+				finalAttachments.push(attachmentData);
+			}
+		}
+
+		return finalAttachments;
+	}
+
+	// This method downloads the attachment data from the URL and returns the data with the following structure:
+	// - content (required): The base64 encoded content of the attachment
+	// - filename (required): The filename of the attachment
+	// - type: The MIME type of the attachment (e.g., image/jpeg or application/pdf)
+	// - disposition: 'attachment'
+	// - content_id: A unique identifier for the attachment
+	async	retrieveAttachmentData(_attachment)
+	{
+		// get the URL
+		let	url = ObjUtils.GetValueToString(_attachment, "url");
+		if (StringUtils.IsEmpty(url) == true)
+			return null;
+
+		// get the filename
+		let	filename = ObjUtils.GetValueToString(_attachment, "filename");
+		if (StringUtils.IsEmpty(filename) == true)
+			return null;
+
+		// download the datas to base64
+		let	data = await this.getWebClient().downloadFileToBase64(url);
+		if (data == null)
+			return null;
+
+		// get the type
+		let	type = ObjUtils.GetValueToString(_attachment, "type");
+		if (StringUtils.IsEmpty(type) == true)
+			type = "application/octet-stream";
+
+		// get the disposition
+		let	disposition = ObjUtils.GetValueToString(_attachment, "disposition");
+		if (StringUtils.IsEmpty(disposition) == true)
+			disposition = "attachment";
+
+		// get the content_id
+		let	contentId = ObjUtils.GetValueToString(_attachment, "content_id");
+		if (StringUtils.IsEmpty(contentId) == true)
+			contentId = "";
+
+		// build the final structure
+		let	finalAttachment = {
+			content: data,
+			filename: filename,
+			type: type,
+			disposition: disposition,
+			content_id: contentId
+		};
+
+		return finalAttachment;
+	}
+
 	// https://docs.sendgrid.com/api-reference/mail-send/mail-send
-	async	sendEmailToMultiple(_toEmails, _fromEmail, _fromName, _subject, _contentHTML, _contentText = "", _secretKey = "", _bccEmails = [])
+	async	sendEmailToMultiple(_toEmails, _fromEmail, _fromName, _subject, _contentHTML, _contentText = "", _secretKey = "", _bccEmails = [], _attachments = [])
 	{
 		// get the emails
 		let	toEmails = [];
@@ -124,14 +195,21 @@ class	SendGridAPI
 			});
 		}
 
+		// attachments?
+		let	finalAttachments = await this.retrieveAttachments(_attachments);
+		if (ArrayUtils.IsEmpty(finalAttachments) == false)
+		{
+			body.attachments = finalAttachments;
+		}
+
 		// send the query
 		let	result = await this.query(QueryUtils.HTTP_METHOD_POST, "/mail/send", body, _secretKey);
 		return result;
 	}
 
-	async	sendEmail(_toEmail, _fromEmail, _fromName, _subject, _contentHTML, _contentText = "", _secretKey = "", _bccEmails = [])
+	async	sendEmail(_toEmail, _fromEmail, _fromName, _subject, _contentHTML, _contentText = "", _secretKey = "", _bccEmails = [], _attachments = [])
 	{
-		return await this.sendEmailToMultiple([{email: _toEmail}], _fromEmail, _fromName, _subject, _contentHTML, _contentText, _secretKey, _bccEmails);
+		return await this.sendEmailToMultiple([{email: _toEmail}], _fromEmail, _fromName, _subject, _contentHTML, _contentText, _secretKey, _bccEmails, _attachments);
 	}
 
 	async	senderVerification_create(_nickname, _email, _fromName, _addressStreet, _addressState, _addressCity, _addressCountry, _addressZip, _secretKey = "")
