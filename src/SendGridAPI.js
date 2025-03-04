@@ -125,7 +125,7 @@ class	SendGridAPI
 	}
 
 	// https://docs.sendgrid.com/api-reference/mail-send/mail-send
-	async	sendEmailToMultiple(_toEmails, _fromEmail, _fromName, _subject, _contentHTML, _contentText = "", _secretKey = "", _bccEmails = [], _attachments = [])
+	async	sendEmailToMultiple(_toEmails, _fromEmail, _fromName, _subject, _contentHTML, _contentText = "", _secretKey = "", _bccEmails = [], _attachments = [], _ccEmails = [])
 	{
 		// get the emails
 		let	toEmails = [];
@@ -135,7 +135,6 @@ class	SendGridAPI
 			let	email = ObjUtils.GetValueToString(info, "email").toLowerCase();
 			if ( (StringUtils.IsEmpty(email) == false) && (allEmails.includes(email) == false) )
 			{
-
 				toEmails.push({email: email});
 				allEmails.push(email);
 			}
@@ -173,6 +172,23 @@ class	SendGridAPI
 				if (allEmails.includes(email) == false)
 				{
 					body.personalizations[0].bcc.push({"email": email});
+					allEmails.push(email);
+				}			
+			}
+		}
+
+		// add cc emails?
+		if (ArrayUtils.IsEmpty(_ccEmails) == false)
+		{
+			// Avoid SendGrid error: Do not include the main recipient's email address (_toEmail) in the BCC list.
+			body.personalizations[0]["cc"] = [];
+			for(let email of _ccEmails)
+			{
+				// do not add
+				if (allEmails.includes(email) == false)
+				{
+					body.personalizations[0].cc.push({"email": email});
+					allEmails.push(email);
 				}			
 			}
 		}
@@ -207,9 +223,9 @@ class	SendGridAPI
 		return result;
 	}
 
-	async	sendEmail(_toEmail, _fromEmail, _fromName, _subject, _contentHTML, _contentText = "", _secretKey = "", _bccEmails = [], _attachments = [])
+	async	sendEmail(_toEmail, _fromEmail, _fromName, _subject, _contentHTML, _contentText = "", _secretKey = "", _bccEmails = [], _attachments = [], _ccEmails = [])
 	{
-		return await this.sendEmailToMultiple([{email: _toEmail}], _fromEmail, _fromName, _subject, _contentHTML, _contentText, _secretKey, _bccEmails, _attachments);
+		return await this.sendEmailToMultiple([{email: _toEmail}], _fromEmail, _fromName, _subject, _contentHTML, _contentText, _secretKey, _bccEmails, _attachments, _ccEmails);
 	}
 
 	async	senderVerification_create(_nickname, _email, _fromName, _addressStreet, _addressState, _addressCity, _addressCountry, _addressZip, _secretKey = "")
