@@ -14,5 +14,16 @@
 			},
 			"bcc": []
 		}
+	],
+	"twilio": {
+		"account_sid": "",
+		"auth_token": "",
+		"service_sid": ""
+	},
+	"sms": [
+		{
+			"to": "+9999999999",
+			"body": "test sms"
+		}
 	]
 }

@@ -21,3 +21,6 @@ Update ES4X Utils:
 ```bash
 npm run update:helpers
 ```
+
+
+export JAVA_HOME=`/usr/libexec/java_home -v 11`

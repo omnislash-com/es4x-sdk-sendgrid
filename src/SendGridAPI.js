@@ -410,6 +410,80 @@ class	SendGridAPI
 		}
 	}
 
+	async	sendTextMessage(_toPhone, _message, _twilioConfig)
+	{
+		// validate required parameters
+		if (StringUtils.IsEmpty(_toPhone) || StringUtils.IsEmpty(_message) || _twilioConfig == null)
+		{
+			LogUtils.LogError("Missing required parameters for sendTextMessage", {
+				toPhone: _toPhone,
+				message: _message,
+				twilioConfig: _twilioConfig
+			});
+			return null;
+		}
+
+		// validate twilio config
+		let accountSid = ObjUtils.GetValueToString(_twilioConfig, "account_sid");
+		let authToken = ObjUtils.GetValueToString(_twilioConfig, "auth_token");
+		let serviceSid = ObjUtils.GetValueToString(_twilioConfig, "service_sid");
+
+		if (StringUtils.IsEmpty(accountSid) || StringUtils.IsEmpty(authToken) || StringUtils.IsEmpty(serviceSid))
+		{
+			LogUtils.LogError("Missing required Twilio configuration", {
+				account_sid: accountSid ? "present" : "missing",
+				auth_token: authToken ? "present" : "missing",
+				service_sid: serviceSid ? "present" : "missing"
+			});
+			return null;
+		}
+
+		// prepare the form data
+		let body = {
+			To: _toPhone,
+			MessagingServiceSid: serviceSid,
+			Body: _message
+		};
+
+		// prepare headers with basic auth
+		let auth = accountSid + ':' + authToken;
+		let headers = {
+//			'Content-Type': 'application/json',
+			'Authorization': 'Basic ' + StringUtils.StringToBase64(auth)
+		};
+
+		// build the URL
+		let	host = "api.twilio.com";
+		let path = `/2010-04-01/Accounts/${accountSid}/Messages.json`;
+
+		try
+		{
+			// send the request using the web client
+			// _method, _host, _path, _data = null, _headers = {}, _toJson = false, _dataIsJson = true, _port = 443, _ssl = true, _dataIsForm = false
+			let response = await this.getWebClient().query(QueryUtils.HTTP_METHOD_POST, host, path, body, headers, true, false, 443, true, true);
+			
+			// check if successful
+			if (response && response.statusCode >= 200 && response.statusCode < 300)
+			{
+				return response.content;
+			}
+			else
+			{
+				LogUtils.LogError("Failed to send SMS via Twilio", {
+					statusCode: response ? response.statusCode : "unknown",
+					response: response
+				});
+				return null;
+			}
+		}
+		catch (error)
+		{
+			console.trace(error);
+			LogUtils.LogError("Error sending SMS via Twilio", error);
+			return null;
+		}
+	}
+
 }
 
 module.exports = {
